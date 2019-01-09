@@ -13,6 +13,8 @@ import UIKit
 final class ViewController: UIViewController {
 
     private let disposeBag = DisposeBag()
+    private let subject = PublishSubject<String>()
+    private let bindSubject = PublishSubject<String>()
     
     @IBOutlet private var textLabel: UILabel!
     
@@ -22,9 +24,14 @@ final class ViewController: UIViewController {
         //runObserveInterval()
         //runRepeatly()
         //runMap()
-        runFilter()
+        //runFilter()
+        //runSubject()
+        runBind()
     }
 
+    @IBAction func doSomeThing(_ sender: Any) {
+        subject.onNext("Hi I am Back Bro 🙈")
+    }
 }
 
 extension ViewController {
@@ -99,5 +106,34 @@ extension ViewController {
                 print(filterElement)
             }).disposed(by: disposeBag)
         //debounce in this example just skips elements that aren’t at least 2 seconds apart. So if an element will be emitted after 1 second after the last one, it’ll be skipped, if it’s emitted 2.5 seconds after the last one, it’ll be emitted.
+    }
+}
+
+/// Subject
+extension ViewController {
+    
+    private func runSubject() {
+        let observable: Observable<String> = subject
+        observable.subscribe(onNext: { (text) in
+            print(text)
+            self.textLabel.text = text
+        }).disposed(by: disposeBag)
+        subject.onNext("🐔🐔🐔🐔")
+        subject.onNext("🐢🐢🐢")
+    }
+    
+    /*Binding
+     You can bind an Observable to a Subject. It means that the Observable will pass all it’s values in the sequence to the Subject
+     */
+    private func runBind() {
+        let observable = Observable<String>.just("Hi I am NewBind")
+        bindSubject.subscribe(onNext: { (bindString) in
+            self.textLabel.text = bindString
+        }) .disposed(by: disposeBag)
+        // passing all values including error/completed
+//        observable.subscribe { (event) in
+//            self.bindSubject.on(event)
+//        }.disposed(by: disposeBag)
+        observable.bind(to: bindSubject).disposed(by: disposeBag)
     }
 }
