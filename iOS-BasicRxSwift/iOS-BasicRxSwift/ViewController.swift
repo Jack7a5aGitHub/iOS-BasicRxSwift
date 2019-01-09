@@ -15,6 +15,7 @@ final class ViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let subject = PublishSubject<String>()
     private let bindSubject = PublishSubject<String>()
+    private var myText = Variable("")
     
     @IBOutlet private var textLabel: UILabel!
     
@@ -26,11 +27,13 @@ final class ViewController: UIViewController {
         //runMap()
         //runFilter()
         //runSubject()
-        runBind()
+        //runBind()
+        runVariable()
     }
 
     @IBAction func doSomeThing(_ sender: Any) {
         subject.onNext("Hi I am Back Bro 🙈")
+        myText.value = "Hi I am Back Bro 🙈"
     }
 }
 
@@ -135,5 +138,14 @@ extension ViewController {
 //            self.bindSubject.on(event)
 //        }.disposed(by: disposeBag)
         observable.bind(to: bindSubject).disposed(by: disposeBag)
+    }
+    private func runVariable() {
+        myText = Variable("my TEXT 🐽!!!")
+        print("value", myText.value)
+        myText.value = "BB 🐽"
+        myText.asObservable().subscribe(onNext: { (elementString) in
+            self.textLabel.text = elementString
+        }).disposed(by: disposeBag)
+        
     }
 }
